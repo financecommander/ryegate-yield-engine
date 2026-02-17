@@ -52,8 +52,8 @@ exports.pushRevenueOracle = async (req, res) => {
     console.log('Oracle function triggered');
     
     // Validate environment
-    if (!process.env.ORACLE_PRIVATE_KEY || !process.env.REVENUE_ORACLE_ADDRESS) {
-      throw new Error('Missing required env vars: ORACLE_PRIVATE_KEY, REVENUE_ORACLE_ADDRESS');
+    if (!process.env.ORACLE_PRIVATE_KEY || !process.env.REVENUE_ORACLE_ADDRESS || !process.env.POLYGON_RPC_URL) {
+      throw new Error('Missing required env vars: ORACLE_PRIVATE_KEY, REVENUE_ORACLE_ADDRESS, POLYGON_RPC_URL');
     }
 
     let revenueData;
@@ -78,6 +78,11 @@ exports.pushRevenueOracle = async (req, res) => {
     if (!revenueData.grossRevenue || !revenueData.operatingCosts || !revenueData.adjustedEBITDA || 
         !revenueData.periodStart || !revenueData.periodEnd) {
       throw new Error('Missing required revenue fields: grossRevenue, operatingCosts, adjustedEBITDA, periodStart, periodEnd');
+    }
+
+    // Validate date formats
+    if (isNaN(Date.parse(revenueData.periodStart)) || isNaN(Date.parse(revenueData.periodEnd))) {
+      throw new Error('Invalid date format for periodStart or periodEnd');
     }
 
     // Convert values
