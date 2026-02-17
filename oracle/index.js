@@ -81,8 +81,11 @@ exports.pushRevenueOracle = async (req, res) => {
     }
 
     // Validate date formats
-    if (isNaN(Date.parse(revenueData.periodStart)) || isNaN(Date.parse(revenueData.periodEnd))) {
-      throw new Error('Invalid date format for periodStart or periodEnd');
+    if (isNaN(Date.parse(revenueData.periodStart))) {
+      throw new Error(`Invalid date format for periodStart: ${revenueData.periodStart}`);
+    }
+    if (isNaN(Date.parse(revenueData.periodEnd))) {
+      throw new Error(`Invalid date format for periodEnd: ${revenueData.periodEnd}`);
     }
 
     // Convert values

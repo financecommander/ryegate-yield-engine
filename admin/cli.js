@@ -193,7 +193,11 @@ async function status() {
       console.log(`Period End: ${new Date(Number(latestReport.periodEnd) * 1000).toISOString().split('T')[0]}`);
     } catch (error) {
       console.log('\n=== Latest Oracle Report ===');
-      console.log('No report available yet or error fetching:', error.message);
+      if (error.message.includes('call revert')) {
+        console.log('No report available yet');
+      } else {
+        console.log('Error fetching report:', error.message);
+      }
     }
   } catch (error) {
     console.error('Error:', error.message);
