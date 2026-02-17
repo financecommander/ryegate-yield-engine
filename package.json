@@ -1,0 +1,43 @@
+{
+  "name": "ryegate-yield-engine",
+  "version": "1.0.0",
+  "description": "ERC-1400 Security Token + Yield Engine for Power Plant Tokenization",
+  "main": "index.js",
+  "scripts": {
+    "test": "hardhat test",
+    "compile": "hardhat compile",
+    "deploy": "hardhat run scripts/deploy.js",
+    "deploy:amoy": "hardhat run scripts/deploy.js --network amoy",
+    "deploy:polygon": "hardhat run scripts/deploy.js --network polygon",
+    "deploy:base": "hardhat run scripts/deploy.js --network base",
+    "verify": "hardhat verify",
+    "gas-report": "REPORT_GAS=true hardhat test",
+    "coverage": "hardhat coverage",
+    "lint": "solhint 'contracts/**/*.sol'",
+    "slither": "slither ."
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "@openzeppelin/contracts-upgradeable": "^5.0.0"
+  },
+  "devDependencies": {
+    "hardhat": "^2.22.0",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.0",
+    "@openzeppelin/hardhat-upgrades": "^3.0.0",
+    "@typechain/hardhat": "^9.0.0",
+    "@typechain/ethers-v6": "^0.5.0",
+    "hardhat-gas-reporter": "^2.0.0",
+    "solidity-coverage": "^0.8.0",
+    "solhint": "^4.0.0",
+    "chai": "^4.4.0",
+    "ethers": "^6.11.0",
+    "dotenv": "^16.4.0",
+    "typescript": ">=4.5.0",
+    "ts-node": ">=8.0.0",
+    "@types/mocha": ">=9.1.0"
+  }
+}
