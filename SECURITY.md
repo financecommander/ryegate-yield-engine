@@ -12,7 +12,7 @@
 - Transfer restrictions enforced at contract level (not frontend)
 - Oracle data validated on-chain (EBITDA <= revenue, valid periods)
 - Pull-based yield prevents gas griefing attacks
-- 12-month Reg D lockup enforced in contract, not by convention
+- 12-month REG_D lockup enforced in contract, not by convention
 
 ## Key Roles
 | Role | Purpose | Holder |

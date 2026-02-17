@@ -11,5 +11,4 @@ jobs:
           cache: 'npm'
       - run: npm install --legacy-peer-deps
       - run: npx hardhat compile
-      - run: npx hardhat test
       - run: REPORT_GAS=true npx hardhat test
