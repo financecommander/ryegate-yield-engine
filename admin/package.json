@@ -1,0 +1,11 @@
+{
+  "name": "ryegate-admin-cli",
+  "version": "1.0.0",
+  "main": "cli.js",
+  "bin": { "ryegate": "./cli.js" },
+  "dependencies": {
+    "ethers": "^6.11.0",
+    "dotenv": "^16.4.0",
+    "commander": "^12.0.0"
+  }
+}

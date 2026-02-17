@@ -1,0 +1,139 @@
+name: Deploy to Testnet
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'contracts/**'
+      - 'scripts/**'
+      - 'hardhat.config.js'
+  workflow_dispatch:
+    inputs:
+      skip_verification:
+        description: 'Skip contract verification'
+        required: false
+        default: 'false'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    environment:
+      name: amoy-testnet
+      url: https://testnet.ryegate.io
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+    
+    - name: Compile contracts
+      run: npx hardhat compile
+    
+    - name: Run tests before deployment
+      run: npx hardhat test
+    
+    - name: Create .env file
+      run: |
+        echo "PRIVATE_KEY=${{ secrets.TESTNET_DEPLOYER_PRIVATE_KEY }}" >> .env
+        echo "AMOY_RPC_URL=${{ secrets.AMOY_RPC_URL }}" >> .env
+        echo "POLYGONSCAN_API_KEY=${{ secrets.POLYGONSCAN_API_KEY }}" >> .env
+    
+    - name: Deploy to Amoy
+      run: npx hardhat run scripts/deploy-testnet.js --network amoy
+    
+    - name: Verify contracts
+      if: ${{ github.event.inputs.skip_verification != 'true' }}
+      run: |
+        sleep 30
+        npx hardhat run scripts/verify-contracts.js --network amoy
+      continue-on-error: true
+    
+    - name: Seed testnet
+      run: npx hardhat run scripts/seed-testnet.js --network amoy
+    
+    - name: Extract deployed addresses
+      id: addresses
+      run: |
+        LATEST_DEPLOYMENT=$(ls -t deployments/amoy-*.json | head -1)
+        echo "deployment_file=$LATEST_DEPLOYMENT" >> $GITHUB_OUTPUT
+        
+        USDC=$(jq -r '.contracts.MockUSDC' $LATEST_DEPLOYMENT)
+        KYC=$(jq -r '.contracts.KYCWhitelist' $LATEST_DEPLOYMENT)
+        ORACLE=$(jq -r '.contracts.RevenueOracle' $LATEST_DEPLOYMENT)
+        NOTES=$(jq -r '.contracts.RyegateNotes' $LATEST_DEPLOYMENT)
+        
+        echo "usdc_address=$USDC" >> $GITHUB_OUTPUT
+        echo "kyc_address=$KYC" >> $GITHUB_OUTPUT
+        echo "oracle_address=$ORACLE" >> $GITHUB_OUTPUT
+        echo "notes_address=$NOTES" >> $GITHUB_OUTPUT
+    
+    - name: Upload deployment artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: deployment-info
+        path: ${{ steps.addresses.outputs.deployment_file }}
+    
+    - name: Update frontend environment
+      run: |
+        echo "VITE_TESTNET_USDC_ADDRESS=${{ steps.addresses.outputs.usdc_address }}" >> frontend/.env.testnet
+        echo "VITE_TESTNET_KYC_ADDRESS=${{ steps.addresses.outputs.kyc_address }}" >> frontend/.env.testnet
+        echo "VITE_TESTNET_ORACLE_ADDRESS=${{ steps.addresses.outputs.oracle_address }}" >> frontend/.env.testnet
+        echo "VITE_TESTNET_NOTES_ADDRESS=${{ steps.addresses.outputs.notes_address }}" >> frontend/.env.testnet
+    
+    - name: Deploy frontend to testnet
+      if: success()
+      run: |
+        echo "Frontend deployment would happen here"
+        # Example: Deploy to Vercel, Netlify, or cloud storage
+        # cd frontend && npm run build && vercel --prod
+    
+    - name: Notify deployment success
+      if: success()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const output = `### 🚀 Testnet Deployment Successful
+          
+          **Network:** Polygon Amoy (80002)
+          
+          **Deployed Contracts:**
+          - MockUSDC: \`${{ steps.addresses.outputs.usdc_address }}\`
+          - KYCWhitelist: \`${{ steps.addresses.outputs.kyc_address }}\`
+          - RevenueOracle: \`${{ steps.addresses.outputs.oracle_address }}\`
+          - RyegateNotes: \`${{ steps.addresses.outputs.notes_address }}\`
+          
+          **View on Explorer:**
+          - [RyegateNotes](https://amoy.polygonscan.com/address/${{ steps.addresses.outputs.notes_address }})
+          
+          **Test the deployment:**
+          - Frontend: https://testnet.ryegate.io
+          - Faucet MATIC: https://faucet.polygon.technology/
+          `;
+          
+          github.rest.repos.createCommitComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            commit_sha: context.sha,
+            body: output
+          });
+    
+    - name: Notify deployment failure
+      if: failure()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.repos.createCommitComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            commit_sha: context.sha,
+            body: '❌ Testnet deployment failed. Check workflow logs for details.'
+          });

@@ -1,0 +1,11 @@
+{
+  "name": "ryegate-oracle",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "ethers": "^6.11.0",
+    "dotenv": "^16.4.0",
+    "@google-cloud/functions-framework": "^3.3.0",
+    "axios": "^1.6.0"
+  }
+}
