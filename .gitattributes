@@ -1,0 +1,45 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Solidity files
+*.sol text eol=lf
+
+# JavaScript files
+*.js text eol=lf
+*.json text eol=lf
+
+# Markdown files
+*.md text eol=lf
+
+# Configuration files
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.config.js text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+
+# Windows batch files
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+
+# Archives
+*.zip binary
+*.tar binary
+*.gz binary
+*.rar binary
+
+# Linguist settings
+*.sol linguist-language=Solidity
+*.js linguist-language=JavaScript
+test/** linguist-documentation
+scripts/** linguist-vendored
