@@ -14,12 +14,17 @@ const RYEGATE_NOTES_ABI = [
 ];
 
 const REVENUE_ORACLE_ABI = [
-  'function pushRevenue(uint256 grossRevenue, uint256 operatingCosts, uint256 adjustedEBITDA, uint256 periodStart, uint256 periodEnd) external'
+  'function pushRevenue(uint256 grossRevenue, uint256 operatingCosts, uint256 adjustedEBITDA, uint256 periodStart, uint256 periodEnd) external',
+  'function getLatestReport() view returns (tuple(uint256 grossRevenue, uint256 operatingCosts, uint256 adjustedEBITDA, uint256 periodStart, uint256 periodEnd))'
 ];
 
 const USDC_ABI = [
   'function approve(address spender, uint256 amount) external returns (bool)',
   'function balanceOf(address account) view returns (uint256)'
+];
+
+const KYC_WHITELIST_ABI = [
+  'function whitelistAddress(address account, bytes32 kycHash, bool isAccredited, uint256 expiresAt) external'
 ];
 
 // Helper functions
@@ -159,6 +164,12 @@ async function status() {
     );
     
     const usdc = new ethers.Contract(process.env.USDC_ADDRESS, USDC_ABI, signer);
+    
+    const oracle = new ethers.Contract(
+      process.env.REVENUE_ORACLE_ADDRESS,
+      REVENUE_ORACLE_ABI,
+      signer
+    );
 
     const [currentPeriod, totalSupply, usdcBalance] = await Promise.all([
       notes.currentPeriod(),
@@ -170,6 +181,24 @@ async function status() {
     console.log(`Current Period: ${currentPeriod.toString()}`);
     console.log(`Total Supply: ${weiToDollar(totalSupply).toLocaleString()}`);
     console.log(`USDC Balance: $${weiToDollar(usdcBalance).toLocaleString()}`);
+    
+    // Fetch latest oracle report
+    try {
+      const latestReport = await oracle.getLatestReport();
+      console.log('\n=== Latest Oracle Report ===');
+      console.log(`Gross Revenue: $${weiToDollar(latestReport.grossRevenue).toLocaleString()}`);
+      console.log(`Operating Costs: $${weiToDollar(latestReport.operatingCosts).toLocaleString()}`);
+      console.log(`Adjusted EBITDA: $${weiToDollar(latestReport.adjustedEBITDA).toLocaleString()}`);
+      console.log(`Period Start: ${new Date(Number(latestReport.periodStart) * 1000).toISOString().split('T')[0]}`);
+      console.log(`Period End: ${new Date(Number(latestReport.periodEnd) * 1000).toISOString().split('T')[0]}`);
+    } catch (error) {
+      console.log('\n=== Latest Oracle Report ===');
+      if (error.message.includes('call revert')) {
+        console.log('No report available yet');
+      } else {
+        console.log('Error fetching report:', error.message);
+      }
+    }
   } catch (error) {
     console.error('Error:', error.message);
     process.exit(1);
@@ -181,19 +210,35 @@ async function whitelist(address, options) {
     console.log(`Whitelisting ${address}...`);
     const signer = await getSigner();
     
+    const kycWhitelist = new ethers.Contract(
+      process.env.KYC_WHITELIST_ADDRESS,
+      KYC_WHITELIST_ABI,
+      signer
+    );
+    
     // Generate random KYC hash
     const kycHash = ethers.keccak256(ethers.randomBytes(32));
     
     const expiresAt = options.expires ? dateToTimestamp(options.expires) : 0;
+    const isAccredited = options.accredited || false;
     
-    console.log(`✓ Address would be whitelisted`);
+    const tx = await kycWhitelist.whitelistAddress(
+      address,
+      kycHash,
+      isAccredited,
+      expiresAt
+    );
+    const receipt = await tx.wait();
+
+    console.log(`✓ Address whitelisted`);
     console.log(`  Address: ${address}`);
-    console.log(`  Accredited: ${options.accredited ? 'Yes' : 'No'}`);
+    console.log(`  Accredited: ${isAccredited ? 'Yes' : 'No'}`);
     console.log(`  KYC Hash: ${kycHash}`);
     if (options.expires) {
       console.log(`  Expires: ${options.expires}`);
     }
-    console.log('\nNote: Actual implementation requires KYCWhitelist contract methods');
+    console.log(`  TX Hash: ${tx.hash}`);
+    console.log(`  Gas Used: ${receipt.gasUsed.toString()}`);
   } catch (error) {
     console.error('Error:', error.message);
     process.exit(1);
