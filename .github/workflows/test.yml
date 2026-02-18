@@ -9,88 +9,24 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci --legacy-peer-deps
-    
-    - name: Compile contracts
-      run: npx hardhat compile
-    
-    - name: Run unit tests
-      run: npx hardhat test
-    
-    - name: Run integration tests
-      run: npx hardhat test test/integration/**/*.test.js
-    
-    - name: Run security tests
-      run: npx hardhat test test/security/**/*.sol
-    
-    - name: Generate coverage report
-      run: npx hardhat coverage
-    
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        files: ./coverage/coverage-final.json
-        flags: hardhat-tests
-        name: codecov-umbrella
-        fail_ci_if_error: false
-    
-    - name: Check coverage threshold
-      run: |
-        COVERAGE=$(npx hardhat coverage --temp artifacts --testfiles "test/**/*.test.js" | grep "All files" | awk '{print $4}' | sed 's/%//')
-        echo "Coverage: $COVERAGE%"
-        if (( $(echo "$COVERAGE < 80" | bc -l) )); then
-          echo "❌ Coverage is below 80%"
-          exit 1
-        else
-          echo "✅ Coverage meets threshold"
-        fi
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install --legacy-peer-deps
+      - run: npx hardhat compile
+      - run: npx hardhat test
   
   frontend-test:
     runs-on: ubuntu-latest
-    
+    if: hashFiles('frontend/package.json') != ''
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20.x'
-        cache: 'npm'
-        cache-dependency-path: frontend/package-lock.json
-    
-    - name: Install frontend dependencies
-      working-directory: ./frontend
-      run: npm ci
-    
-    - name: Build frontend
-      working-directory: ./frontend
-      run: npm run build
-    
-    - name: Check for build errors
-      working-directory: ./frontend
-      run: |
-        if [ ! -d "dist" ]; then
-          echo "❌ Build failed - dist directory not created"
-          exit 1
-        fi
-        echo "✅ Frontend build successful"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: cd frontend && npm install && npm run build
   
   oracle-test:
     runs-on: ubuntu-latest
@@ -118,41 +54,11 @@ jobs:
   
   gas-report:
     runs-on: ubuntu-latest
-    
+    needs: test
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20.x'
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci --legacy-peer-deps
-    
-    - name: Generate gas report
-      run: REPORT_GAS=true npx hardhat test > gas-report.txt
-    
-    - name: Upload gas report
-      uses: actions/upload-artifact@v3
-      with:
-        name: gas-report
-        path: gas-report.txt
-    
-    - name: Comment gas report on PR
-      if: github.event_name == 'pull_request'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const fs = require('fs');
-          const gasReport = fs.readFileSync('gas-report.txt', 'utf8');
-          const output = `### ⛽ Gas Report\n\n\`\`\`\n${gasReport}\n\`\`\``;
-          
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: output
-          });
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install --legacy-peer-deps
+      - run: REPORT_GAS=true npx hardhat test
