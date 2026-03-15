@@ -2,7 +2,5 @@ const { expect } = require('chai');
 const { ethers } = require('hardhat');
 
 describe('YieldOptimizer', function () {
-    it('Should get yield rate', async function () {
-        // TODO: implement test logic
-    });
+    // TODO: implement comprehensive test suite for YieldOptimizer contract
 });

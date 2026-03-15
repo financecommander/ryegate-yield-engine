@@ -1,7 +1,7 @@
-const hre = require("hardhat");
+const hre = require('hardhat');
 
 async function main() {
-    // TODO: implement deployment logic for Phase 2 contracts
+    // TODO: implement deployment scripts for all new contracts
 }
 
 main().catch((error) => {
