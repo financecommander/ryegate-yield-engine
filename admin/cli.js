@@ -1,17 +1,17 @@
-const fs = require('fs');
-const web3 = require('web3');
+const axios = require('axios');
+const { argv } = require('yargs');
 
 // Function to manage yield strategies
-const manageStrategies = async () => {
-    // TODO: Implement strategy management logic
+async function manageYieldStrategies() {
+    // TODO: implement manage yield strategies logic
 }
 
-// Function to whitelist addresses
-const whitelistAddresses = async () => {
-    // TODO: Implement whitelisting logic
+// Function to whitelist a new yield source
+async function whitelistYieldSource() {
+    // TODO: implement whitelist yield source logic
 }
 
-// Function to emergency pause system
-const emergencyPause = async () => {
-    // TODO: Implement emergency pause logic
+// Function to pause the yield engine in case of an emergency
+async function emergencyPause() {
+    // TODO: implement emergency pause logic
 }

@@ -1,16 +1,19 @@
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.0;
 
-import '@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol';
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 contract OracleAggregator {
-    AggregatorV3Interface[] public oracles;
+    // Mapping of oracles to their respective yields
+    mapping(address => AggregatorV3Interface) public oracles;
 
-    function addOracle(address _oracle) public {
-        oracles.push(AggregatorV3Interface(_oracle));
+    // Function to add a new oracle
+    function addOracle(address oracle) public {
+        // TODO: implement add oracle logic
     }
 
-    function getLatestPrice() public view returns (int256) {
-        // TODO: Implement Chainlink oracle aggregation logic
-        return 0;
+    // Function to get the latest yield rate from an oracle
+    function getLatestYieldRate(address oracle) public view returns (uint256) {
+        // TODO: implement get latest yield rate logic
     }
 }
