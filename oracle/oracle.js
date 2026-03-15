@@ -1,25 +1,12 @@
-const express = require('express');
-const app = express();
-const Web3 = require('web3');
-const web3 = new Web3('https://mainnet.infura.io/v3/YOUR_PROJECT_ID');
+const axios = require('axios');
+const web3 = require('web3');
 
-// Define the oracle contract ABI
-const oracleAbi = [...];
+// Function to fetch yield rates from APIs
+const fetchYieldRates = async () => {
+    // TODO: Implement yield rate fetching logic
+}
 
-// Define the oracle contract address
-const oracleAddress = '0x...';
-
-// Create a new instance of the oracle contract
-const oracleContract = new web3.eth.Contract(oracleAbi, oracleAddress);
-
-// Define the API endpoint for fetching yield rates
-app.get('/yield-rates', async (req, res) => {
-    // Fetch the yield rates from the oracle contract
-    const yieldRates = await oracleContract.methods.getYieldRates().call();
-    res.json(yieldRates);
-});
-
-// Start the server
-app.listen(3000, () => {
-    console.log('Oracle server listening on port 3000');
-});
+// Function to push yield rates to chain
+const pushYieldRates = async () => {
+    // TODO: Implement yield rate pushing logic
+}
