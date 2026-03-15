@@ -1,26 +1,26 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.0;
+pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 contract YieldOptimizer {
-    // Mapping of yield sources to their respective strategies
-    mapping(address => Strategy) public yieldSources;
+    // Mapping of yield sources to their respective yield rates
+    mapping(address => uint256) public yieldRates;
+    // Mapping of yield sources to their respective liquidity
+    mapping(address => uint256) public liquidity;
+    // Array of yield sources
+    address[] public yieldSources;
 
-    // Structure to hold yield strategy information
-    struct Strategy {
-        address yieldSource;
-        uint256 balance;
-        uint256 yieldRate;
+    function getYieldRate(address yieldSource) public view returns (uint256) {
+        return yieldRates[yieldSource];
     }
 
-    // Function to add a new yield source
-    function addYieldSource(address yieldSource, uint256 balance) public {
-        // TODO: implement add yield source logic
+    function addYieldSource(address yieldSource, uint256 yieldRate) public {
+        yieldSources.push(yieldSource);
+        yieldRates[yieldSource] = yieldRate;
     }
 
-    // Function to calculate yield rates across all yield sources
-    function calculateYieldRates() public view returns (mapping(address => uint256)) {
-        // TODO: implement calculate yield rates logic
+    function updateYieldRate(address yieldSource, uint256 yieldRate) public {
+        yieldRates[yieldSource] = yieldRate;
     }
 }

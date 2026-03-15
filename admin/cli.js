@@ -1,17 +1,12 @@
-const axios = require('axios');
-const { argv } = require('yargs');
+const { Command } = require('commander');
 
-// Function to manage yield strategies
-async function manageYieldStrategies() {
-    // TODO: implement manage yield strategies logic
-}
+const program = new Command();
 
-// Function to whitelist a new yield source
-async function whitelistYieldSource() {
-    // TODO: implement whitelist yield source logic
-}
+program
+    .command('manage-strategies')
+    .description('Manage yield strategies')
+    .action(() => {
+        // TODO: implement logic to manage yield strategies
+    });
 
-// Function to pause the yield engine in case of an emergency
-async function emergencyPause() {
-    // TODO: implement emergency pause logic
-}
+program.parse(process.argv);

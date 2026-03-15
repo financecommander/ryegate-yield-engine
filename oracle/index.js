@@ -1,17 +1,13 @@
-const express = require('express');
-const app = express();
 const axios = require('axios');
 
-// Function to fetch yield rates from Chainlink oracles
 async function fetchYieldRates() {
-    // TODO: implement fetch yield rates logic
+    // TODO: implement yield rate fetching logic
+    const yieldRates = [];
+    return yieldRates;
 }
 
-// Function to push yield rates to the blockchain
-async function pushYieldRates() {
-    // TODO: implement push yield rates logic
+async function pushYieldRatesToChain(yieldRates) {
+    // TODO: implement logic to push yield rates to chain
 }
 
-app.listen(3000, () => {
-    console.log('Oracle service listening on port 3000');
-});
+module.exports = { fetchYieldRates, pushYieldRatesToChain };

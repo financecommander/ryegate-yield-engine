@@ -1,19 +1,18 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.0;
-
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+pragma solidity ^0.8.0;
 
 contract LiquidityManager {
-    // Mapping of liquidity pools to their respective balances
-    mapping(address => uint256) public liquidityPools;
+    // Mapping of liquidity pools to their respective liquidity
+    mapping(address => uint256) public liquidity;
+    // Array of liquidity pools
+    address[] public liquidityPools;
 
-    // Function to add a new liquidity pool
-    function addLiquidityPool(address pool) public {
-        // TODO: implement add liquidity pool logic
+    function getLiquidity(address liquidityPool) public view returns (uint256) {
+        return liquidity[liquidityPool];
     }
 
-    // Function to rebalance liquidity across all pools
-    function rebalanceLiquidity() public {
-        // TODO: implement rebalance liquidity logic
+    function addLiquidityPool(address liquidityPool, uint256 liquidityAmount) public {
+        liquidityPools.push(liquidityPool);
+        liquidity[liquidityPool] = liquidityAmount;
     }
 }
