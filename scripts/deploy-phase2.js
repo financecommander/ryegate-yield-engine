@@ -1,25 +1,32 @@
-const hre = require("hardhat");
+const { ethers } = require('ethers');
+const { YieldOptimizer, OracleAggregator, LiquidityManager, GovernanceModule } = require('../contracts');
 
-async function main() {
-    // Deploy YieldOptimizer contract
-    const YieldOptimizer = await hre.ethers.getContractFactory("YieldOptimizer");
-    const yieldOptimizer = await YieldOptimizer.deploy();
-    await yieldOptimizer.deployed();
+async function deploy() {
+    const provider = new ethers.providers.InfuraProvider('mainnet', 'YOUR_PROJECT_ID');
+    const wallet = new ethers.Wallet('YOUR_PRIVATE_KEY', provider);
 
-    // Deploy OracleAggregator contract
-    const OracleAggregator = await hre.ethers.getContractFactory("OracleAggregator");
-    const oracleAggregator = await OracleAggregator.deploy();
-    await oracleAggregator.deployed();
+    const yieldOptimizer = await new YieldOptimizer().deploy({
+        gasLimit: 1000000,
+        gasPrice: ethers.utils.parseUnits('20', 'gwei')
+    });
+    console.log('YieldOptimizer deployed to:', yieldOptimizer.address);
 
-    // Deploy LiquidityManager contract
-    const LiquidityManager = await hre.ethers.getContractFactory("LiquidityManager");
-    const liquidityManager = await LiquidityManager.deploy();
-    await liquidityManager.deployed();
+    const oracleAggregator = await new OracleAggregator().deploy({
+        gasLimit: 1000000,
+        gasPrice: ethers.utils.parseUnits('20', 'gwei')
+    });
+    console.log('OracleAggregator deployed to:', oracleAggregator.address);
 
-    // Deploy GovernanceModule contract
-    const GovernanceModule = await hre.ethers.getContractFactory("GovernanceModule");
-    const governanceModule = await GovernanceModule.deploy();
-    await governanceModule.deployed();
+    const liquidityManager = await new LiquidityManager().deploy({
+        gasLimit: 1000000,
+        gasPrice: ethers.utils.parseUnits('20', 'gwei')
+    });
+    console.log('LiquidityManager deployed to:', liquidityManager.address);
+
+    const governanceModule = await new GovernanceModule().deploy({
+        gasLimit: 1000000,
+        gasPrice: ethers.utils.parseUnits('20', 'gwei')
+    });
+    console.log('GovernanceModule deployed to:', governanceModule.address);
 }
-
-main();
+deploy();

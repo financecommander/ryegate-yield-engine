@@ -1,13 +1,23 @@
-# Ryegate Yield Engine Phase 2+
-## Introduction
-The Ryegate Yield Engine is a decentralized finance (DeFi) protocol that aims to provide a high-yield, low-risk investment platform for users.
-## Architecture
-The protocol consists of several components:
-* YieldOptimizer: Optimizes yield across lending protocols
-* OracleAggregator: Aggregates prices from oracles
-* LiquidityManager: Rebalances liquidity across yield sources
-* GovernanceModule: Provides on-chain governance for yield parameter changes
+# Phase 2 Documentation
+
+## Overview
+
+Phase 2 of the ryegate-yield-engine includes the implementation of the YieldOptimizer, OracleAggregator, LiquidityManager, and GovernanceModule contracts.
+
 ## Deployment
-The protocol can be deployed using the `scripts/deploy-phase2.js` script.
+
+To deploy the contracts, run the `deploy-phase2.js` script in the `scripts` directory.
+
+## Architecture
+
+The YieldOptimizer contract is responsible for optimizing yield across multiple lending protocols.
+
+The OracleAggregator contract aggregates yield rates and prices from multiple oracles.
+
+The LiquidityManager contract rebalances liquidity across multiple yield sources.
+
+The GovernanceModule contract provides on-chain governance for yield parameter changes.
+
 ## Testing
-The protocol can be tested using the `test/YieldOptimizer.test.js` script.
+
+To test the contracts, run the `test` script in the `test` directory.
